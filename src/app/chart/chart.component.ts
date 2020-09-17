@@ -30,84 +30,138 @@ export class ChartComponent {
     // Chart code goes in here
     this.browserOnly(() => {
 
-am4core.useTheme(am4themes_animated);
-// Themes end
 
-var chart = am4core.create("chartdiv", am4charts.XYChart);
+      // Themes begin
+      am4core.useTheme(am4themes_animated);
+      // Themes end
 
-chart.data = [{
-        "part": "C Channel",
-        "output": 23.5,
-        "target": 25.1
-    }, {
-        "part": "Ramp Cut",
-        "output": 26.2,
-        "target": 22.8
-    }, {
-        "part": "Introducer Attach",
-        "output": 30.1,
-        "target": 23.9
-    }, {
-        "part": "Attach Inspect",
-        "output": 29.5,
-        "target": 25.1
-    }, {
-        "part": "Ramp Form",
-        "output": 24.6,
-        "target": 25
-    }];
+      // Create chart instance
+      var chart = am4core.create("chartdiv", am4charts.XYChart);
+      chart.maskBullets = false;
+      chart.numberFormatter.numberFormat = "#.#";
 
-//create category axis for years
-var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
-categoryAxis.dataFields.category = "part";
-categoryAxis.renderer.minGridDistance = 40;
-categoryAxis.fontSize = 11;
-categoryAxis.renderer.labels.template.rotation = -45;
+      chart.data =[
+        {
+              "name": "Running",
+              "value": 93000000,
+              "space":10,
+              "cat":''
+            },
+            {
+              "name": "Stopped",
+              "value": 89400000,
+              "space":9,
+              "cat":''
+            },
+            {
+              "name": "On Water",
+              "value": 62000000,
+              "space":8,
+              "cat":''
+            },
+            {
+              "name": "StartUp/ ShutDown",
+              "value": 73000000,
+              "space":7,
+              "cat":''
+            },
+            {
+              "name": "Idle",
+              "value": 73000000,
+              "space":6,
+              "cat":''
+            },
+               {
+              "name": "Running",
+              "value": 73000000,
+              "space":5,
+              "cat":''
+            },
+            {
+              "name": "Stopped",
+              "value": 89400000,
+              "space":4,
+              "cat":''
+            },
+            {
+             "name": "On Water",
+              "value": 62000000,
+              "space":3,
+              "cat":''
+            },
+            {
+              "name": "StartUp/ ShutDown",
+              "value": 73000000,
+              "space":2,
+              "cat":''
+            },
+            {
+              "name": "Idle",
+              "value": 73000000,
+              "space":1,
+              "cat":''
+            }
+          ];
+
+      // Create axes
+      var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+      categoryAxis.dataFields.category = "name";
+      categoryAxis.renderer.grid.template.location = 0;
+
+      var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+      valueAxis.renderer.inside = true;
+      valueAxis.renderer.labels.template.disabled = true;
+      valueAxis.min = 0;
+      valueAxis.extraMax = 0.1;
+      valueAxis.calculateTotals = true;
+
+      // Create series
+
+
+        // Set up series
+        var series = chart.series.push(new am4charts.ColumnSeries());
+        series.name = "State";
+        series.dataFields.valueY = "value";
+        series.dataFields.categoryX = "name";
+        series.sequencedInterpolation = true;
+
+        // Make it stacked
+        series.stacked = true;
+
+        // Configure columns
+        series.columns.template.width = am4core.percent(60);
+        series.columns.template.tooltipText = "[bold]{name}[/]\n[font-size:14px]{categoryX}: {valueY}";
+
+        // Add label
+        var labelBullet = series.bullets.push(new am4charts.LabelBullet());
+        labelBullet.label.text = "{valueY}";
+        labelBullet.label.fill = am4core.color("#fff");
+        labelBullet.locationY = 0.5;
 
 
 
-//create value axis for income and expenses
-var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-console.log(chart.data);
-
-//create columns
-var series = chart.series.push(new am4charts.ColumnSeries());
-series.dataFields.categoryX = "part";
-series.dataFields.valueY = "output";
-series.name = "Parts";
-series.columns.template.fillOpacity = 1;
-series.columns.template.strokeOpacity = 0;
 
 
+      // Create series for total
+      // var totalSeries = chart.series.push(new am4charts.ColumnSeries());
+      // totalSeries.dataFields.valueY = "none";
+      // totalSeries.dataFields.categoryX = "year";
+      // totalSeries.stacked = true;
+      // totalSeries.hiddenInLegend = true;
+      // totalSeries.columns.template.strokeOpacity = 0;
+      //
+      // var totalBullet = totalSeries.bullets.push(new am4charts.LabelBullet());
+      // totalBullet.dy = -20;
+      // totalBullet.label.text = "{valueY.total}";
+      // totalBullet.label.hideOversized = false;
+      // totalBullet.label.fontSize = 18;
+      // totalBullet.label.background.fill = totalSeries.stroke;
+      // totalBullet.label.background.fillOpacity = 0.2;
+      // totalBullet.label.padding(5, 10, 5, 10);
 
 
-
-
-series.columns.template.adapter.add("fill", (fill, target) => {
-    var dataItem = target.dataItem;
-    if (dataItem.valueY >= dataItem.dataContext.target) {
-        return am4core.color("#78b711");
-    }
-    else {
-        return am4core.color("red");
-    }
-})
-
-
-
-
-//create line
-var lineSeries = chart.series.push(new am4charts.LineSeries());
-lineSeries.dataFields.categoryX = "part";
-lineSeries.dataFields.valueY = "target";
-lineSeries.name = "Target";
-lineSeries.strokeWidth = 3;
-lineSeries.stroke = am4core.color("yellow");
-
-//add bullets
-var circleBullet = lineSeries.bullets.push(new am4charts.CircleBullet());
-circleBullet.circle.fill = am4core.color("#fff");
-circleBullet.circle.strokeWidth = 2;
+      // Legend
+      chart.legend = new am4charts.Legend();
     });
   }
 
